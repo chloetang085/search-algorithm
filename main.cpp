@@ -145,4 +145,3 @@ int main() {
     cout << "Best feature set: All features, Accuracy: " << accuracy * 100 << "%\n";
 
     return 0;
-}
