@@ -11,7 +11,7 @@ double Validator::validate() {
     size_t correct_predictions = 0;
     size_t n = X.size();
 
-    cout << "Instance | Predicted | Actual | Correct | Time Elapsed (ms)" << endl;
+    // cout << "Instance | Predicted | Actual | Correct | Time Elapsed (ms)" << endl;
 
     // Loop over each instance in the dataset
     for (size_t i = 0; i < n; ++i) {
@@ -45,9 +45,9 @@ double Validator::validate() {
         }
 
         // Print trace for this instance with elapsed time
-        cout << i << "        | " << predicted << "         | " << y_test 
-                  << "      | " << (is_correct ? "Yes" : "No") 
-                  << "      | " << elapsed_time.count() << " ms" << endl;
+        // cout << i << "        | " << predicted << "         | " << y_test 
+        //           << "      | " << (is_correct ? "Yes" : "No") 
+        //           << "      | " << elapsed_time.count() << " ms" << endl;
     }
 
     // Return the accuracy as a fraction of correct predictions

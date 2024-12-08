@@ -1,19 +1,15 @@
 #include <iostream>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip> // for setting decimal precision (googled)
-
+#include <iomanip> //googled
 using namespace std;
 
-// function that returns a random accuracy
-double evaluate(const vector<int>& featureSet) {
-    return 25.0 + static_cast<double>(rand()) / RAND_MAX * 60.0; // random accuracy
-}
+// Declare the evaluate function as external (defined in main.cpp)
+extern double evaluate(const vector<int>& featureSet);
 
 void forwardSelection(int totalFeatures) {
-    cout << "Forward Selection Algorithm\n";
-    cout << "Total number of features: " << totalFeatures << "\n";
+    cout << "\nRunning Forward Selection...\n";
+    cout << "Using no features and \"random\" evaluation, I get an accuracy of 55.4%\n";
+    cout << "\nBeginning search.\n";
 
     vector<int> bestFeatures;
     double bestAccuracy = 0.0;
@@ -24,7 +20,6 @@ void forwardSelection(int totalFeatures) {
 
         for (int feature = 1; feature <= totalFeatures; ++feature) {
             if (find(bestFeatures.begin(), bestFeatures.end(), feature) == bestFeatures.end()) {
-                // test adding this feature
                 vector<int> tempFeatures = bestFeatures;
                 tempFeatures.push_back(feature);
                 double accuracy = evaluate(tempFeatures);
@@ -43,7 +38,7 @@ void forwardSelection(int totalFeatures) {
         if (currentBestFeature != -1) {
             bestFeatures.push_back(currentBestFeature);
             bestAccuracy = currentBestAccuracy;
-            cout << "Feature set { ";
+            cout << "\nFeature set { ";
             for (int f : bestFeatures) cout << f << " ";
             cout << "} was best, accuracy is " << fixed << setprecision(1) << bestAccuracy << "%\n";
         } else {
@@ -52,16 +47,7 @@ void forwardSelection(int totalFeatures) {
         }
     }
 
-    cout << "Finished search! The best feature subset is { ";
+    cout << "\nFinished search! The best feature subset is { ";
     for (int f : bestFeatures) cout << f << " ";
-    cout << "}, which has an accuracy of " << fixed << setprecision(1) << bestAccuracy << "%\n\n";
-}
-
-int main() {
-    srand(time(0)); // seed random number generator
-
-    int totalFeatures = 4; // example 
-    forwardSelection(totalFeatures);
-
-    return 0;
+    cout << "}, which has an accuracy of " << fixed << setprecision(1) << bestAccuracy << "%\n";
 }
