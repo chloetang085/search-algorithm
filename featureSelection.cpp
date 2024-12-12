@@ -104,4 +104,3 @@ void backwardElimination(int totalFeatures, const vector<vector<double>>& X, con
     cout << "\nBest Feature Subset (Backward Elimination): { ";
     for (int feat : currentFeatures) cout << feat << " ";
     cout << "} | Accuracy: " << fixed << setprecision(2) << bestAccuracy * 100 << "%\n";
-}
