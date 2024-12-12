@@ -4,21 +4,20 @@
 #include "NNClassifier.h"
 #include <vector>
 
-
 class Validator {
-public:
-    // Constructor to initialize the validator with classifier, data, and labels
-    Validator(NearestNeighborClassifier& classifier, 
-                         const vector<vector<double>>& X, 
-                         const vector<int>& y);
-
-    // Method to perform leave-one-out cross-validation and return accuracy
-    double validate();
-
 private:
     NearestNeighborClassifier& classifier;
-    const vector<vector<double>>& X;
-    const vector<int>& y;
+    const std::vector<std::vector<double>>& X;
+    const std::vector<int>& y;
+    std::vector<int> featureSubset; // Added featureSubset for filtering
+
+public:
+    Validator(NearestNeighborClassifier& classifier, 
+              const std::vector<std::vector<double>>& X, 
+              const std::vector<int>& y,
+              const std::vector<int>& featureSubset);
+
+    double validate();
 };
 
-#endif 
+#endif
