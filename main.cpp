@@ -4,7 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <stdexcept>
-#include "FeatureSelection.h" // Include the header file for feature selection
+#include "FeatureSelection.h" 
 #include "Validator.h"
 #include "NNClassifier.h"
 
@@ -52,11 +52,11 @@ int main() {
 
     string filename;
     if (datasetChoice == 1) {
-        filename = "small-test-dataset.txt"; // Replace with actual small dataset file path
+        filename = "small-test-dataset.txt"; //small
     } else if (datasetChoice == 2) {
-        filename = "large-test-dataset.txt"; // Replace with actual large dataset file path
+        filename = "large-test-dataset.txt"; //large
     } else if (datasetChoice == 3) {
-        filename = "titanic-clean.txt"; // Replace with actual Titanic dataset file path
+        filename = "titanic-clean.txt"; //titanic
     } else {
         cerr << "Invalid choice. Exiting program.\n";
         return 1;
