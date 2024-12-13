@@ -3,7 +3,9 @@
 
 #include <vector>
 
-void forwardSelection(int totalFeatures, const std::vector<std::vector<double>>& X, const std::vector<int>& y);
-void backwardElimination(int totalFeatures, const std::vector<std::vector<double>>& X, const std::vector<int>& y);
+using namespace std;
+
+void forwardSelection(int totalFeatures, const std::vector<vector<double>>& X, const vector<int>& y);
+void backwardElimination(int totalFeatures, const std::vector<vector<double>>& X, const vector<int>& y);
 
 #endif // FEATURESELECTION_H
