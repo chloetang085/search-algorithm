@@ -10,6 +10,15 @@
 
 using namespace std;
 
+// Group: Chloe Tang – 862337626 – Huong Le – 862388494
+// Small Dataset Results:
+// Forward: Feature Subset: {1}, Acc: 0.75
+// Backward: Feature Subset: {6} Acc: 0.75
+// Random: Feature Subset: {3} Acc: 0.68
+// Large Dataset Results:
+// Forward: Feature Subset: {28,2}, Acc: 0.95
+// Backward: Feature Subset: {1,27}, Acc: 0.95
+
 // Function to load data from a file
 void loadDataset(const string& filename, vector<vector<double>>& X, vector<int>& y) {
     ifstream file(filename);
