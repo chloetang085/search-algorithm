@@ -1,94 +1,107 @@
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <stdexcept>
-#include "FeatureSelection.h" 
+#include "featureSelection.h"
 #include "Validator.h"
 #include "NNClassifier.h"
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
-// Function to load data from a file
-void loadDataset(const string& filename, vector<vector<double>>& X, vector<int>& y) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        throw runtime_error("Could not open the file: " + filename);
-    }
-
-    string line;
-    while (getline(file, line)) {
-        stringstream ss(line);
-        int label;
-        ss >> label;
-        y.push_back(label);
-
-        vector<double> features;
-        double value;
-        while (ss >> value) {
-            features.push_back(value);
-        }
-        X.push_back(features);
-    }
-
-    cout << "Dataset loaded successfully from " << filename << ".\n";
+double evaluateFeatureSet(const vector<int>& featureSet, const vector<vector<double>>& X, const vector<int>& y) {
+    // Initialize NNClassifier and Validator
+    NearestNeighborClassifier nn_classifier;
+    Validator validator(nn_classifier, X, y, featureSet);
+    return validator.validate();
 }
 
-// Main function
-int main() {
-    srand(time(0)); // Seed for random number generation
+void forwardSelection(int totalFeatures, const vector<vector<double>>& X, const vector<int>& y) {
+    cout << "\nRunning Forward Selection...\n";
 
-    vector<vector<double>> X;
-    vector<int> y;
+    vector<int> currentFeatures;
+    double bestAccuracy = 0.0;
 
-    cout << "Select the dataset to use:\n";
-    cout << "1. Small Dataset\n";
-    cout << "2. Large Dataset\n";
-    cout << "3. Titanic Dataset\n";
-    cout << "Enter your choice (1, 2, or 3): ";
-    int datasetChoice;
-    cin >> datasetChoice;
+    for (int i = 1; i <= totalFeatures; ++i) {
+        int bestFeature = -1;
+        double maxAccuracy = bestAccuracy;
 
-    string filename;
-    if (datasetChoice == 1) {
-        filename = "small-test-dataset.txt"; //small
-    } else if (datasetChoice == 2) {
-        filename = "large-test-dataset.txt"; //large
-    } else if (datasetChoice == 3) {
-        filename = "titanic-clean.txt"; //titanic
-    } else {
-        cerr << "Invalid choice. Exiting program.\n";
-        return 1;
+        for (int f = 1; f <= totalFeatures; ++f) {
+            if (find(currentFeatures.begin(), currentFeatures.end(), f) != currentFeatures.end()) {
+                continue; // Skip already selected features
+            }
+
+            vector<int> tempFeatures = currentFeatures;
+            tempFeatures.push_back(f);
+
+            double accuracy = evaluateFeatureSet(tempFeatures, X, y);
+            cout << "Using feature(s) { ";
+            for (int feat : tempFeatures) cout << feat << " ";
+            cout << "} accuracy is " << fixed << setprecision(2) << accuracy * 100 << "%\n";
+
+            if (accuracy > maxAccuracy) {
+                maxAccuracy = accuracy;
+                bestFeature = f;
+            }
+        }
+
+        if (bestFeature != -1) {
+            currentFeatures.push_back(bestFeature);
+            bestAccuracy = maxAccuracy;
+            cout << "Feature set { ";
+            for (int feat : currentFeatures) cout << feat << " ";
+            cout << "} was best, accuracy is " << fixed << setprecision(2) << bestAccuracy * 100 << "%\n";
+        } else {
+            break;
+        }
     }
 
-    try {
-        loadDataset(filename, X, y); // Load the selected dataset
-    } catch (const runtime_error& e) {
-        cerr << e.what() << endl;
-        return 1;
+    cout << "\nBest Feature Subset (Forward Selection): { ";
+    for (int feat : currentFeatures) cout << feat << " ";
+    cout << "} | Accuracy: " << fixed << setprecision(2) << bestAccuracy * 100 << "%\n";
+}
+
+void backwardElimination(int totalFeatures, const vector<vector<double>>& X, const vector<int>& y) {
+    cout << "\nRunning Backward Elimination...\n";
+
+    vector<int> currentFeatures;
+    for (int i = 1; i <= totalFeatures; ++i) currentFeatures.push_back(i);
+
+    double bestAccuracy = evaluateFeatureSet(currentFeatures, X, y);
+    cout << "Using all features { ";
+    for (int f : currentFeatures) cout << f << " ";
+    cout << "}, initial accuracy is " << fixed << setprecision(2) << bestAccuracy * 100 << "%\n";
+
+    while (currentFeatures.size() > 1) {
+        int worstFeature = -1;
+        double maxAccuracy = 0.0;
+
+        for (int f : currentFeatures) {
+            vector<int> tempFeatures = currentFeatures;
+            tempFeatures.erase(remove(tempFeatures.begin(), tempFeatures.end(), f), tempFeatures.end());
+
+            double accuracy = evaluateFeatureSet(tempFeatures, X, y);
+            cout << "Removing feature " << f << " -> accuracy with feature(s) { ";
+            for (int feat : tempFeatures) cout << feat << " ";
+            cout << "} is " << fixed << setprecision(2) << accuracy * 100 << "%\n";
+
+            if (accuracy > maxAccuracy) {
+                maxAccuracy = accuracy;
+                worstFeature = f;
+            }
+        }
+
+        if (worstFeature != -1) {
+            currentFeatures.erase(remove(currentFeatures.begin(), currentFeatures.end(), worstFeature), currentFeatures.end());
+            bestAccuracy = maxAccuracy;
+            cout << "Feature set { ";
+            for (int feat : currentFeatures) cout << feat << " ";
+            cout << "} was best, accuracy is " << fixed << setprecision(2) << bestAccuracy * 100 << "%\n";
+        } else {
+            break;
+        }
     }
 
-    cout << "Welcome to Feature Selection Algorithm!" << endl;
-    cout << "Total number of features: ";
-    int totalFeatures = X[0].size(); // Set total features dynamically based on the dataset
-    cout << totalFeatures << endl;
-
-    cout << "\nType the number of the algorithm you want to run:\n";
-    cout << "1. Forward Selection\n";
-    cout << "2. Backward Elimination\n";
-    cout << "Enter your choice: ";
-
-    int choice;
-    cin >> choice;
-
-    if (choice == 1) {
-        forwardSelection(totalFeatures, X, y);
-    } else if (choice == 2) {
-        backwardElimination(totalFeatures, X, y);
-    } else {
-        cout << "Invalid choice. Exiting program.\n";
-    }
-
-    return 0;
+    cout << "\nBest Feature Subset (Backward Elimination): { ";
+    for (int feat : currentFeatures) cout << feat << " ";
+    cout << "} | Accuracy: " << fixed << setprecision(2) << bestAccuracy * 100 << "%\n";
 }
